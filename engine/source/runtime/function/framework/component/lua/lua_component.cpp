@@ -71,7 +71,7 @@ namespace Piccolo
         }
         else
         {
-            LOG_ERROR("Can't find target field.")
+            LOG_ERROR("Can't find target field.");
         }
     }
 
@@ -88,7 +88,6 @@ namespace Piccolo
         else
         {
             LOG_ERROR("Can't find target field.");
-            return false;
         }
     }
 
