@@ -10,6 +10,7 @@ namespace Piccolo
         m_lua_state.open_libraries(sol::lib::base);
         m_lua_state.set_function("set_float", &LuaComponent::set<float>);
         m_lua_state.set_function("get_bool", &LuaComponent::get<bool>);
+        m_lua_state.set_function("invoke", &LuaComponent::invoke);
         m_lua_state["GameObject"] = m_parent_object;
     }
 
@@ -90,5 +91,65 @@ namespace Piccolo
             LOG_ERROR("Can't find target field.");
         }
     }
+
+       void LuaComponent::invoke(std::weak_ptr<GObject> game_object, const char* name)
+    {
+        LOG_INFO(name);
+
+        Reflection::TypeMeta meta;
+        void* target_instance = nullptr;
+        std::string method_name;
+        std::string target_name(name);
+
+        // get target instance and meta
+        size_t pos = target_name.find_last_of('.');
+        method_name = target_name.substr(pos + 1, target_name.size());
+        target_name = target_name.substr(0, pos);
+
+        if (target_name.find_first_of('.') == target_name.npos)
+        {
+            auto components = game_object.lock()->getComponents();
+            auto components_iter = std::find_if(
+                components.begin(), components.end(), [target_name](auto c){return c.getTypeName() == target_name;});
+            if (components_iter != components.end())
+            {
+                auto meta = Reflection::TypeMeta::newMetaFromName(target_name);
+                target_instance = components_iter->getPtr();
+            }
+            else
+            {
+                LOG_ERROR("CANT NOT FIND CONPONENT!");
+                return;
+            }
+        }
+        else
+        {
+            Reflection::FieldAccessor field_accessor;
+            if(find_component_field(game_object, name, field_accessor, target_instance))
+            {
+                target_instance = field_accessor.get(target_instance);
+                field_accessor.getTypeMeta(meta);
+            }
+            else
+            {
+                LOG_ERROR("Can't find target field.");
+                return;
+            }
+        }
+
+        Reflection::MethodAccessor* methods;
+        size_t method_count = meta.getMethodsList(methods);
+        auto method_iter = std::find_if(methods, methods + method_count, [method_name](auto m){return m.getMethodName() == method_name;});
+        if (method_iter != methods + method_count)
+        {
+            method_iter->invoke(target_instance);
+        }
+        else
+        {
+            LOG_ERROR("CANT NOT FIND METHOD!");
+        }
+        delete []methods;
+    }
+
 
 } // namespace Piccolo

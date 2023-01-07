@@ -38,6 +38,11 @@ namespace Piccolo
         m_target_position = transform_component->getPosition();
     }
 
+    void MotorComponent::getOffStuckDead()
+    {
+        LOG_INFO("Some get off dead");
+    }
+
     MotorComponent::~MotorComponent()
     {
         if (m_controller_type == ControllerType::physics)
