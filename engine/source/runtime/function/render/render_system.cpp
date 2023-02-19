@@ -432,6 +432,7 @@ namespace Piccolo
 
             m_swap_context.resetPartilceBatchSwapData();
         }
+
         if (swap_data.m_emitter_tick_request.has_value())
         {
             std::static_pointer_cast<ParticlePass>(m_render_pipeline->m_particle_pass)

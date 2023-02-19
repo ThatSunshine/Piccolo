@@ -87,7 +87,7 @@ namespace Piccolo
                 ++fileds_iter.first;
             }
 
-            m_method_map.clear();
+            m_methods.clear();
             auto methods_iter = m_method_map.equal_range(type_name);
             while (methods_iter.first != methods_iter.second)
             {

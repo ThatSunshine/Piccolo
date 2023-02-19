@@ -113,7 +113,7 @@ namespace Piccolo
                 components.begin(), components.end(), [target_name](auto c){return c.getTypeName() == target_name;});
             if (components_iter != components.end())
             {
-                auto meta = Reflection::TypeMeta::newMetaFromName(target_name);
+                meta = Reflection::TypeMeta::newMetaFromName(target_name);
                 target_instance = components_iter->getPtr();
             }
             else
